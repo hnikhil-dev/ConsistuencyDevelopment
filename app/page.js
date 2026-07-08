@@ -682,13 +682,13 @@ export default function CitizenPortal() {
               <p className="text-xs text-slate-500 mt-1">{t.tracker_desc}</p>
             </div>
 
-            <form onSubmit={handleTrackSubmission} className="flex gap-2">
+            <form onSubmit={handleTrackSubmission} className="flex gap-2 items-center">
               <input 
                 type="text" 
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
                 placeholder={t.placeholder_tracker}
-                className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-base text-slate-950 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:bg-white transition"
+                className="flex-1 min-w-0 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-base text-slate-950 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:bg-white transition"
               />
               <button
                 type="submit"

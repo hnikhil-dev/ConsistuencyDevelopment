@@ -22,7 +22,7 @@ export default function HotspotMap({ wardStats, onSelectWard, selectedWardId, su
 
   if (!mounted) {
     return (
-      <div className="h-[420px] w-full rounded-xl bg-slate-100 flex items-center justify-center animate-pulse border border-slate-350">
+      <div className="h-56 sm:h-72 md:h-96 lg:h-[420px] w-full rounded-xl bg-slate-100 flex items-center justify-center animate-pulse border border-slate-350">
         <span className="text-slate-500 font-bold">Loading Interactive Maps...</span>
       </div>
     );
@@ -37,7 +37,7 @@ export default function HotspotMap({ wardStats, onSelectWard, selectedWardId, su
   );
 
   return (
-    <div className="h-[420px] w-full rounded-xl overflow-hidden border border-slate-300 shadow-md relative z-10">
+    <div className="h-56 sm:h-72 md:h-96 lg:h-[420px] w-full rounded-xl overflow-hidden border border-slate-300 shadow-md relative z-10">
       <MapContainer 
         center={position} 
         zoom={12} 
