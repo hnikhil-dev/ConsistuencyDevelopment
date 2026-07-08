@@ -244,7 +244,7 @@ export default function CitizenPortal() {
           } else if (event.error === 'no-speech') {
             console.log("Speech recognition: No speech detected (user paused).");
           } else if (event.error === 'network') {
-            console.warn("Speech recognition: Network error occurred.");
+            alert("Speech Input Connection Error:\n\nConnection to the browser's speech-to-text server was blocked or timed out. This commonly happens if privacy extensions (e.g., Plurality), adblockers, or firewalls block the browser's audio stream sockets. \n\nPlease try disabling blocking extensions for this site, check your internet, or type your suggestion directly in the input box.");
           }
         };
 
