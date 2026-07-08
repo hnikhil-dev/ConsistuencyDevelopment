@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
           crossOrigin=""
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
+      </body>
     </html>
   );
 }
