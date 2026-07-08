@@ -17,6 +17,7 @@ import {
   User,
   Landmark
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 // Multilingual Translation Matrix
 const LANG_DICTS = {
@@ -294,19 +295,45 @@ export default function CitizenPortal() {
     }
   };
 
-  // Mock OCR scanning on photo upload
-  const handlePhotoUpload = (e) => {
+  // Mock/Real OCR scanning on photo upload
+  const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageScanning(true);
-      setTimeout(() => {
-        setImageUrl('/mock-photo.jpg'); 
+      try {
+        // 1. Generate unique file path
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        const filePath = `citizen-uploads/${fileName}`;
+
+        // 2. Upload file to Supabase Storage bucket
+        const { data, error } = await supabase.storage
+          .from('image-submissions')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (error) throw error;
+
+        // 3. Retrieve public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('image-submissions')
+          .getPublicUrl(filePath);
+
+        setImageUrl(publicUrl);
+        console.log("Real image uploaded to Supabase Storage:", publicUrl);
+      } catch (err) {
+        console.warn("Storage upload failed or bucket not ready, falling back to mock:", err.message);
+        setImageUrl('/mock-photo.jpg');
+      } finally {
         setImageScanning(false);
+        // Emulate OCR Text Extraction
         setSuggestionText(prev => {
           const append = " [Photo Scan OCR: Water pipe leakage and pooling water on street]";
           return prev ? prev + append : "Water leakage and pipeline damage on main street." + append;
         });
-      }, 1200);
+      }
     }
   };
 
