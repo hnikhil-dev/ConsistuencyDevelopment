@@ -1,7 +1,7 @@
 // app/page.js
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Send, 
@@ -180,6 +180,11 @@ export default function CitizenPortal() {
   // Multilingual active state
   const [currentLang, setCurrentLang] = useState('en'); // en, mr, hi
   const t = LANG_DICTS[currentLang];
+  
+  // Audio recording refs
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
 
   // Submission Form State
   const [userName, setUserName] = useState('');
@@ -280,18 +285,104 @@ export default function CitizenPortal() {
   };
 
   // Toggle voice recorder
-  const toggleRecording = () => {
-    if (!recognition) {
-      alert("Voice speech recognition is not supported on this browser. Please type your query.");
-      return;
-    }
+  const toggleRecording = async () => {
     if (isRecording) {
-      recognition.stop();
+      // 1. Stop Speech recognition if running
+      if (recognition) {
+        try {
+          recognition.stop();
+        } catch (e) {
+          console.warn("Recognition already stopped:", e.message);
+        }
+      }
       setIsRecording(false);
-      setVoiceUrl('/mock-voice.mp3'); // Mock audio file
+
+      // 2. Stop MediaRecorder
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      
+      // 3. Stop Mic Stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
     } else {
-      setIsRecording(true);
-      recognition.start();
+      // 1. Request microphone access
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Microphone recording is not supported on this browser.");
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+        audioChunksRef.current = [];
+
+        // Determine supported audio recording mime-type (chrome supports webm)
+        let mimeType = 'audio/webm';
+        if (MediaRecorder.isTypeSupported && !MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = ''; // Let browser choose default if webm is unsupported
+        }
+
+        const mediaRecorder = mimeType 
+          ? new MediaRecorder(stream, { mimeType }) 
+          : new MediaRecorder(stream);
+          
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType || 'audio/ogg' });
+          if (audioBlob.size > 0) {
+            try {
+              // Upload actual audio file to Supabase voice-submissions storage
+              const fileName = `voice_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.webm`;
+              const filePath = `citizen-audio/${fileName}`;
+
+              const { data, error } = await supabase.storage
+                .from('voice-submissions')
+                .upload(filePath, audioBlob, {
+                  contentType: mimeType || 'audio/webm',
+                  cacheControl: '3600'
+                });
+
+              if (error) throw error;
+
+              const { data: { publicUrl } } = supabase.storage
+                .from('voice-submissions')
+                .getPublicUrl(filePath);
+
+              setVoiceUrl(publicUrl);
+              console.log("Real audio uploaded to Supabase Storage:", publicUrl);
+            } catch (err) {
+              console.warn("Supabase voice upload failed, falling back to mock:", err.message);
+              setVoiceUrl('/mock-voice.mp3');
+            }
+          } else {
+            setVoiceUrl('/mock-voice.mp3');
+          }
+        };
+
+        setIsRecording(true);
+        mediaRecorder.start();
+
+        // Start Web Speech API in parallel for real-time translation (ignoring errors if blocked by Plurality)
+        if (recognition) {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.log("Speech recognition start bypassed:", e.message);
+          }
+        }
+      } catch (err) {
+        console.error("Microphone capture failed:", err);
+        alert("Failed to access your microphone. Please enable mic permissions in your browser bar.");
+      }
     }
   };
 
