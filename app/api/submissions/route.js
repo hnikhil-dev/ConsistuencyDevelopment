@@ -100,3 +100,72 @@ export async function POST(request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing submission ID parameter." }, { status: 400 });
+    }
+
+    // 1. Query raw submission
+    const { data: submission, error: subErr } = await supabase
+      .from('submissions')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (subErr || !submission) {
+      return NextResponse.json({ success: false, error: "Submission ID not found." }, { status: 404 });
+    }
+
+    // 2. Query extracted issue
+    const { data: issue } = await supabase
+      .from('extracted_issues')
+      .select('*')
+      .eq('submission_id', id)
+      .single();
+
+    // 3. Query cluster mapping and project status
+    let projectStatus = 'Proposed';
+    const { data: mapping } = await supabase
+      .from('cluster_mappings')
+      .select('cluster_id')
+      .eq('submission_id', id)
+      .single();
+
+    if (mapping && mapping.cluster_id) {
+      const { data: project } = await supabase
+        .from('projects')
+        .select('status')
+        .eq('cluster_id', mapping.cluster_id)
+        .single();
+      
+      if (project) {
+        projectStatus = project.status;
+      }
+    }
+
+    // Build unified status lifecycle response
+    const trackingInfo = {
+      id: submission.id,
+      user_name: submission.user_name,
+      category: issue ? issue.category : 'roads',
+      issue_details: issue ? issue.issue_details : submission.raw_text,
+      status: issue ? issue.status : 'pending_review',
+      project_status: projectStatus,
+      created_at: submission.created_at
+    };
+
+    return NextResponse.json({
+      success: true,
+      submission: trackingInfo
+    });
+
+  } catch (error) {
+    console.error("GET Submission Status endpoint crash:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
