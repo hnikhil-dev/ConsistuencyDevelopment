@@ -851,7 +851,7 @@ export default function MPDashboard() {
               </div>
 
               {/* Sliders Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border">
                 {Object.entries(weights).map(([dim, val]) => (
                   <div key={dim} className="bg-white p-3 rounded-lg border space-y-1">
                     <div className="flex items-center justify-between text-xs font-bold text-slate-700">
@@ -1077,12 +1077,12 @@ export default function MPDashboard() {
               </div>
 
               {/* Scenario Allocation Overview */}
-              <div className="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border text-center text-xs font-bold">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border text-center text-xs font-bold">
                 <div>
                   <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Allocated Cost</span>
                   <span className="text-base font-black text-slate-900">₹{portfolio.totalSpent.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="border-x border-slate-200">
+                <div className="border-y py-2 min-[480px]:border-y-0 min-[480px]:border-x min-[480px]:py-0 border-slate-200">
                   <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Remaining Balance</span>
                   <span className="text-base font-black text-blue-900">₹{portfolio.remainingBudget.toLocaleString('en-IN')}</span>
                 </div>
