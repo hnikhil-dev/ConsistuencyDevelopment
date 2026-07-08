@@ -260,7 +260,11 @@ export default function CitizenPortal() {
         };
 
         rec.onend = () => {
-          setIsRecording(false);
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            console.log("Speech recognition socket ended, but local MediaRecorder is still active.");
+          } else {
+            setIsRecording(false);
+          }
         };
 
         setRecognition(rec);
