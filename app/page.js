@@ -35,6 +35,7 @@ const LANG_DICTS = {
     demo_scenario: "Load Demo Scenario (Marathi)",
     btn_voice_start: "Record Audio",
     btn_voice_active: "Listening Speech...",
+    btn_audio_active: "Recording Audio Note...",
     btn_voice_attached: "Audio Attached",
     btn_photo_scan: "Upload Photo",
     btn_photo_scanning: "Scanning Image...",
@@ -86,6 +87,7 @@ const LANG_DICTS = {
     demo_scenario: "डेमो सिनेरिओ लोड करा (मराठी)",
     btn_voice_start: "आवाज रेकॉर्ड करा",
     btn_voice_active: "बोलणे ऐकत आहे...",
+    btn_audio_active: "ऑडिओ रेकॉर्ड होत आहे...",
     btn_voice_attached: "ऑडिओ जोडला गेला",
     btn_photo_scan: "फोटो अपलोड करा",
     btn_photo_scanning: "फोटो स्कॅन होत आहे...",
@@ -137,6 +139,7 @@ const LANG_DICTS = {
     demo_scenario: "डेमो परिदृश्य लोड करें (मराठी)",
     btn_voice_start: "आवाज रिकॉर्ड करें",
     btn_voice_active: "भाषण सुन रहे हैं...",
+    btn_audio_active: "ऑडियो रिकॉर्ड हो रहा है...",
     btn_voice_attached: "ऑडियो संलग्न किया गया",
     btn_photo_scan: "फोटो अपलोड करें",
     btn_photo_scanning: "फोटो स्कैन हो रहा है...",
@@ -201,6 +204,7 @@ export default function CitizenPortal() {
   // Audio recording states
   const [isRecording, setIsRecording] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [recordingMode, setRecordingMode] = useState('speech'); // 'speech' or 'audio'
 
   // Ingestion Processing States
   const [submitting, setSubmitting] = useState(false);
@@ -240,16 +244,18 @@ export default function CitizenPortal() {
 
         rec.onerror = (event) => {
           console.warn("Speech recognition service notification:", event.error);
-          setIsRecording(false);
           
           if (event.error === 'not-allowed') {
+            setIsRecording(false);
             alert("Microphone Permission Required:\nPlease click the microphone icon in your browser's address bar and select 'Allow' to enable voice input.");
           } else if (event.error === 'audio-capture') {
+            setIsRecording(false);
             alert("Microphone Capture Error:\nNo microphone hardware was detected. Please connect a mic and try again.");
           } else if (event.error === 'no-speech') {
             console.log("Speech recognition: No speech detected (user paused).");
           } else if (event.error === 'network') {
-            alert("Speech Input Connection Error:\n\nConnection to the browser's speech-to-text server was blocked or timed out. This commonly happens if privacy extensions (e.g., Plurality), adblockers, or firewalls block the browser's audio stream sockets. \n\nPlease try disabling blocking extensions for this site, check your internet, or type your suggestion directly in the input box.");
+            setRecordingMode('audio');
+            console.log("Speech recognition socket blocked by browser extension. Recording raw audio locally instead.");
           }
         };
 
@@ -314,6 +320,7 @@ export default function CitizenPortal() {
       }
 
       try {
+        setRecordingMode('speech');
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         streamRef.current = stream;
         audioChunksRef.current = [];
@@ -677,7 +684,7 @@ export default function CitizenPortal() {
                 }`}
               >
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                {isRecording ? t.btn_voice_active : voiceUrl ? t.btn_voice_attached : t.btn_voice_start}
+                {isRecording ? (recordingMode === 'speech' ? t.btn_voice_active : t.btn_audio_active) : voiceUrl ? t.btn_voice_attached : t.btn_voice_start}
               </button>
 
               {/* Photo Upload Trigger */}
