@@ -14,7 +14,8 @@ import {
   FileText,
   Shield,
   Activity,
-  User
+  User,
+  Landmark
 } from 'lucide-react';
 
 // Multilingual Translation Matrix
@@ -436,11 +437,9 @@ export default function CitizenPortal() {
       {/* Official Government Header */}
       <header className="border-b border-slate-200 bg-white px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" 
-            alt="National Emblem of India" 
-            className="h-16 w-auto object-contain shrink-0 py-0.5"
-          />
+          <div className="h-14 w-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-900 shrink-0 shadow-sm">
+            <Landmark className="h-8 w-8" />
+          </div>
           <div>
             <h1 className="text-xl font-extrabold text-blue-900 tracking-tight">
               {t.header_title}

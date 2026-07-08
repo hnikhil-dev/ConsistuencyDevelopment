@@ -24,7 +24,8 @@ import {
   Briefcase,
   Map,
   ClipboardList,
-  Printer
+  Printer,
+  Landmark
 } from 'lucide-react';
 import { 
   PieChart, 
@@ -328,9 +329,9 @@ export default function MPDashboard() {
           </div>
 
           <div class="header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" class="emblem" />
-            <div style="margin: 0; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">सत्यमेव जयते</div>
-            <h1 class="ministry" style="margin-top: 5px;">Government of Maharashtra</h1>
+            <div style="width: 50px; height: 50px; border-radius: 50%; border: 3px double #1e3a8a; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; color: #1e3a8a; background-color: #f8fafc; font-family: sans-serif;">DPC</div>
+            <div style="margin: 0; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: #1e3a8a;">District Planning Committee</div>
+            <h1 class="ministry" style="margin-top: 5px;">Pune South-East Constituency</h1>
             <h2 class="dept">Office of the District Planning Committee</h2>
             <h3 class="sub-dept">Pune South-East Parliamentary Constituency Development Fund (MPLADS)</h3>
           </div>
@@ -505,12 +506,8 @@ export default function MPDashboard() {
         <div className="h-2 w-full bg-gradient-to-r from-[#f97316] via-white to-[#16a34a]"></div>
         
         <header className="border-b border-slate-200 bg-white px-6 py-4 flex items-center gap-4 shadow-sm">
-          <div className="h-12 w-10 border-2 border-slate-700 rounded flex flex-col items-center justify-between p-1 bg-white shrink-0 shadow-inner">
-            <span className="text-[6px] font-black text-slate-800 tracking-tighter">सत्यमेव</span>
-            <div className="h-3 w-3 rounded-full border border-blue-800 flex items-center justify-center">
-              <div className="h-1.5 w-1.5 rounded-full bg-blue-800"></div>
-            </div>
-            <span className="text-[6px] font-black text-slate-800 tracking-tighter">जयते</span>
+          <div className="h-12 w-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-900 shrink-0 shadow-sm">
+            <Landmark className="h-6 w-6" />
           </div>
           <div>
             <h1 className="text-lg font-black text-blue-900">
@@ -581,11 +578,9 @@ export default function MPDashboard() {
       {/* Official Government Header */}
       <header className="border-b border-slate-200 bg-white px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" 
-            alt="National Emblem of India" 
-            className="h-16 w-auto object-contain shrink-0 py-0.5"
-          />
+          <div className="h-14 w-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-900 shrink-0 shadow-sm">
+            <Landmark className="h-8 w-8" />
+          </div>
           <div>
             <h1 className="text-xl font-extrabold text-blue-900 tracking-tight">
               पब्लिक प्रायोरिटीज - निर्वाचन क्षेत्र विकास योजना
